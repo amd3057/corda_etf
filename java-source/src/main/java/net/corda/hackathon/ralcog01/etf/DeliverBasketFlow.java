@@ -18,7 +18,6 @@ import java.util.List;
 public class DeliverBasketFlow extends OrderBaseFlow {
 
     private final Basket basket;
-    private final Party etfCustodian;
     private final Party apAgent;
 
     /**
@@ -26,9 +25,8 @@ public class DeliverBasketFlow extends OrderBaseFlow {
      */
     private final ProgressTracker progressTracker = new ProgressTracker();
 
-    public DeliverBasketFlow(Basket basket, Party etfCustodian, Party apAgent) {
+    public DeliverBasketFlow(Basket basket, Party apAgent) {
         this.basket = basket;
-        this.etfCustodian = etfCustodian;
         this.apAgent = apAgent;
     }
 
@@ -46,8 +44,10 @@ public class DeliverBasketFlow extends OrderBaseFlow {
         final TransactionBuilder txBuilder = new TransactionBuilder();
         txBuilder.setNotary(notary);
 
+        Party etfCustodian = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("EC", "New York", "US"));
+
         // We create the transaction components.
-        Basket newBasket = new Basket(this.apAgent, this.etfCustodian, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
+        Basket newBasket = new Basket(this.apAgent, etfCustodian, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
         StateAndContract outputContractAndState = new StateAndContract(newBasket, DeliverBasketContract.DELIVER_BASKET_CONTRACT_ID);
         List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), apAgent.getOwningKey());
         Command cmd = new Command<>(new DeliverBasketContract.Create(), requiredSigners);
