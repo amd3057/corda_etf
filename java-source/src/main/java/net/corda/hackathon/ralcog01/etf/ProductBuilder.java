@@ -6,7 +6,7 @@ import net.corda.core.identity.AbstractParty;
 import java.util.Collections;
 import java.util.Currency;
 
-public enum EtfUtil {
+public enum ProductBuilder {
 
     instance;
 

@@ -1,13 +1,11 @@
 package net.corda.hackathon.ralcog01.etf;
 
 import com.google.common.collect.ImmutableList;
-import net.corda.core.contracts.Amount;
 import net.corda.core.contracts.CommandAndState;
 import net.corda.core.contracts.OwnableState;
 import net.corda.core.identity.AbstractParty;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -69,7 +67,7 @@ public class Product implements OwnableState {
     }
 
     static Product createProduct (String ticker, AbstractParty owner, final double price, final Integer quantity) {
-        return EtfUtil.setAndGetProductStaticData(ticker, price, quantity, owner);
+        return ProductBuilder.setAndGetProductStaticData(ticker, price, quantity, owner);
     }
 
     public String getTicker() {
