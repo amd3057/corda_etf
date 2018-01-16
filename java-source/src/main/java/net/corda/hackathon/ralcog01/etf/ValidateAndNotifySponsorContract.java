@@ -1,21 +1,22 @@
 package net.corda.hackathon.ralcog01.etf;
 
+import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.CommandData;
 import net.corda.core.contracts.CommandWithParties;
 import net.corda.core.contracts.Contract;
+import net.corda.core.identity.AbstractParty;
 import net.corda.core.transactions.LedgerTransaction;
 
-import static net.corda.core.contracts.ContractsDSL.requireSingleCommand;
-import static net.corda.core.contracts.ContractsDSL.requireThat;
-import net.corda.core.identity.AbstractParty;
-import com.google.common.collect.ImmutableList;
 import java.security.PublicKey;
 import java.util.List;
 
-// Replace TemplateContract's definition with:
-public class DeliverBasketContract implements Contract {
+import static net.corda.core.contracts.ContractsDSL.requireSingleCommand;
+import static net.corda.core.contracts.ContractsDSL.requireThat;
 
-    public static final String DELIVER_BASKET_CONTRACT_ID = "net.corda.hackathon.ralcog01.etf.DeliverBasketContract";
+// Replace TemplateContract's definition with:
+public class ValidateAndNotifySponsorContract implements Contract {
+
+    public static final String VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID = "net.corda.hackathon.ralcog01.etf.ValidateAndNotifySponsorContract";
 
     // Our Create command.
     public static class Create implements CommandData {
@@ -35,10 +36,9 @@ public class DeliverBasketContract implements Contract {
             final AbstractParty issuer = out.getIssuer();
             final AbstractParty owner = out.getOwner();
             check.using("The lender and the borrower cannot be the same entity.", issuer != owner);
-
             // Constraints on the signers.
             final List<PublicKey> signers = command.getSigners();
-            check.using("There must be two signers.", signers.size() == 2);
+            check.using("There must be two signers.", signers.size() == 3);
             check.using("The issuer and owner must be signers.", signers.containsAll(
                     ImmutableList.of(owner.getOwningKey(), issuer.getOwningKey())));
 

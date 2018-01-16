@@ -1,6 +1,5 @@
 package net.corda.hackathon.ralcog01.etf;
 
-import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndContract;
@@ -16,30 +15,26 @@ import net.corda.core.utilities.ProgressTracker;
 import java.security.PublicKey;
 import java.util.List;
 
-public class DeliverBasketFlow extends OrderBaseFlow {
+public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
     private final Basket basket;
     private final Party etfCustodian;
-    private final Party apAgent;
+    private final Party etfSponsor;
+    private final Party participantAccount;
 
     /**
      * The progress tracker provides checkpoints indicating the progress of the flow to observers.
      */
     private final ProgressTracker progressTracker = new ProgressTracker();
 
-    public DeliverBasketFlow(Basket basket, Party etfCustodian, Party apAgent) {
+    public ValidateAndNotifySponsorFlow(Basket basket, Party etfCustodian, Party etfSponsor, Party participantAccount) {
         this.basket = basket;
         this.etfCustodian = etfCustodian;
-        this.apAgent = apAgent;
+        this.etfSponsor = etfSponsor;
+        this.participantAccount = participantAccount;
     }
 
     @Override
-    public ProgressTracker getProgressTracker() {
-        return progressTracker;
-    }
-
-    @Override
-    @Suspendable
     public SignedTransaction call() throws FlowException {
         // We retrieve the notary identity from the network map.
         final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
@@ -48,10 +43,10 @@ public class DeliverBasketFlow extends OrderBaseFlow {
         txBuilder.setNotary(notary);
 
         // We create the transaction components.
-        Basket newBasket = new Basket(this.apAgent, this.etfCustodian, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
-        StateAndContract outputContractAndState = new StateAndContract(newBasket, DeliverBasketContract.DELIVER_BASKET_CONTRACT_ID);
-        List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), apAgent.getOwningKey());
-        Command cmd = new Command<>(new DeliverBasketContract.Create(), requiredSigners);
+        Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
+        StateAndContract outputContractAndState = new StateAndContract(newBasket, ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
+        List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
+        Command cmd = new Command<>(new ValidateAndNotifySponsorContract.Create(), requiredSigners);
 
 
 // We add the items to the builder.
@@ -75,4 +70,11 @@ public class DeliverBasketFlow extends OrderBaseFlow {
 
         return null;
     }
+
+    @Override
+    public ProgressTracker getProgressTracker() {
+        return progressTracker;
+    }
+
+
 }
