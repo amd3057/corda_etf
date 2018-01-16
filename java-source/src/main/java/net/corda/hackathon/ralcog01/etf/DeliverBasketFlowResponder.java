@@ -11,11 +11,11 @@ import net.corda.core.utilities.ProgressTracker;
 
 import static net.corda.core.contracts.ContractsDSL.requireThat;
 
-@InitiatedBy(ProductFlow.class)
-public class IOUFlowResponder extends FlowLogic<Void> {
+@InitiatedBy(DeliverBasketFlow.class)
+public class DeliverBasketFlowResponder extends FlowLogic<Void> {
     private final FlowSession otherPartySession;
 
-    public IOUFlowResponder(FlowSession otherPartySession) {
+    public DeliverBasketFlowResponder(FlowSession otherPartySession) {
         this.otherPartySession = otherPartySession;
     }
 
