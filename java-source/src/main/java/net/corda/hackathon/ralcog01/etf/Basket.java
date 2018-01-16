@@ -6,9 +6,11 @@ import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.AbstractParty;
 import org.jetbrains.annotations.NotNull;
 
+import java.security.PublicKey;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Basket implements LinearState {
 
@@ -81,5 +83,9 @@ public class Basket implements LinearState {
 
     public Product getReqProduct() {
         return reqProduct;
+    }
+
+    public List<PublicKey> getParticipantKeys() {
+        return getParticipants().stream().map(AbstractParty::getOwningKey).collect(Collectors.toList());
     }
 }
