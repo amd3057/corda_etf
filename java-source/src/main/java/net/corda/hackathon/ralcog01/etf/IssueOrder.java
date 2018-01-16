@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.flows.*;
+import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
@@ -88,7 +89,12 @@ public class IssueOrder {
 
             // Step 5. Finalise the transaction.
             progressTracker.setCurrentStep(FINALISING);
-            return subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
+            //return subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
+            subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
+
+            Party apAgent = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("AP", "New York", "US"));
+            return subFlow(new DeliverBasketFlow(basket, apAgent));
+
         }
 
         @Suspendable
