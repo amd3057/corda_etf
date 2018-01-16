@@ -13,6 +13,7 @@ import net.corda.core.utilities.ProgressTracker;
 import java.security.PublicKey;
 import java.util.List;
 
+@InitiatingFlow
 public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
     private final Basket basket;

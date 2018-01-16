@@ -4,10 +4,7 @@ import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndContract;
-import net.corda.core.flows.CollectSignaturesFlow;
-import net.corda.core.flows.FinalityFlow;
-import net.corda.core.flows.FlowException;
-import net.corda.core.flows.FlowSession;
+import net.corda.core.flows.*;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
@@ -17,6 +14,7 @@ import net.corda.core.utilities.ProgressTracker;
 import java.security.PublicKey;
 import java.util.List;
 
+@InitiatingFlow
 public class DeliverBasketFlow extends OrderBaseFlow {
 
     private final Basket basket;

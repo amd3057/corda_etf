@@ -12,6 +12,7 @@ import net.corda.core.utilities.ProgressTracker;
 import java.security.PublicKey;
 import java.util.List;
 
+@InitiatingFlow
 public class DepositToAPFlow extends OrderBaseFlow {
 
     private final Basket basket;
