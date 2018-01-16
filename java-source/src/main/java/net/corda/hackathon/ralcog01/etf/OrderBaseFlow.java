@@ -45,6 +45,20 @@ abstract class OrderBaseFlow extends FlowLogic<SignedTransaction> {
         return products.get(0);
     }
 
+    StateAndRef<Basket> getBasketsByLinearId(UniqueIdentifier linearId) throws FlowException {
+        QueryCriteria queryCriteria = new QueryCriteria.LinearStateQueryCriteria(
+                null,
+                ImmutableList.of(linearId),
+                Vault.StateStatus.UNCONSUMED,
+                null);
+
+        List<StateAndRef<Basket>> baskets = getServiceHub().getVaultService().queryBy(Basket.class, queryCriteria).getStates();
+        if (baskets.size() != 1) {
+            throw new FlowException(String.format("Obligation with id %s not found.", linearId));
+        }
+        return baskets.get(0);
+    }
+
     Party resolveIdentity(AbstractParty abstractParty) {
         return getServiceHub().getIdentityService().requireWellKnownPartyFromAnonymous(abstractParty);
     }
