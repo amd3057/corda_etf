@@ -15,10 +15,10 @@ public enum ProductBuilder {
          if ("AAPL".equals(ticker)) {
              return new Product("AAPL","AAPL123", "Equity", "STOCK",
                       "Apple", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
-                     10000.00, 10000.00, Collections.EMPTY_MAP, owner, "APPL.X", price, quantity);
+                     10000.00, 10000.00, new Product.OurMap<>(), owner, "APPL.X", price, quantity);
          }
         if ("ETF".equals(ticker)) {
-            Map<String,Integer> maps = new HashMap<>();
+            Product.OurMap<String,Integer> maps = new Product.OurMap<>();
             maps.put("AAPL",100);
             maps.put("MSFT",100);
             maps.put("AMZN",100);
@@ -32,12 +32,4 @@ public enum ProductBuilder {
          return null;
     }
 
-   public static Product createETF(final String ticker, final Integer quantity, List<Product> underlying,AbstractParty owner) {
-
-
-            return new Product("SNY5","SNY5Sd", "Equity", "ETF",
-                    "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
-                    10.00, 10.00, underlying.stream().collect(Collectors.toMap(Product::getTicker, Product::getQuantity)), owner, "SNY5.X", 10.00, quantity);
-
-    }
 }

@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.CommandAndState;
 import net.corda.core.contracts.OwnableState;
 import net.corda.core.identity.AbstractParty;
+import net.corda.core.serialization.CordaSerializable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
@@ -22,7 +24,7 @@ public class Product implements OwnableState {
     private final String state;
     private final double marketValue;
     private final double notionalValue;
-    private final Map<String, Integer> productMap;
+    private final OurMap<String, Integer> productMap;
     private final AbstractParty owner;
 
     // dynamic - to be sent from the client
@@ -50,7 +52,7 @@ public class Product implements OwnableState {
 
      public Product(String ticker, String sedol, String assetClass, String productType, String name, String sector,
              String exchange, String state, double marketValue, double notionalValue,
-             Map<String, Integer> productMap, AbstractParty owner, String isin, double price, Integer quantity) {
+                    OurMap<String, Integer> productMap, AbstractParty owner, String isin, double price, Integer quantity) {
 
         this.ticker = ticker;
         this.sedol = sedol;
@@ -148,5 +150,10 @@ public class Product implements OwnableState {
                 "ticker='" + ticker + '\'' +
                 ", quantity=" + quantity +
                 '}';
+    }
+
+
+    @CordaSerializable
+    public static class OurMap<String, Integer>  extends HashMap<String, Integer> {
     }
 }
