@@ -19,10 +19,7 @@ import net.corda.examples.obligation.flows.TransferObligation;
 import net.corda.finance.contracts.asset.Cash;
 import net.corda.finance.flows.AbstractCashFlow;
 import net.corda.finance.flows.CashIssueFlow;
-import net.corda.hackathon.ralcog01.etf.Basket;
-import net.corda.hackathon.ralcog01.etf.Product;
-import net.corda.hackathon.ralcog01.etf.ProductBuilder;
-import net.corda.hackathon.ralcog01.etf.ProductState;
+import net.corda.hackathon.ralcog01.etf.*;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -76,7 +73,15 @@ public class IssueOrder {
     }
 
     @GET
-    @Path("products")
+    @Path("etfs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Product> etfs() {
+        return rpcOps.vaultQuery(Product.class).getStates().stream().filter((p)->p.getState().getData().getProductType().equals(ProductType.ETF.name())).map((p)->p.getState().getData()).collect(Collectors.toList());
+    }
+
+
+    @GET
+    @Path("baskets")
     @Produces(MediaType.APPLICATION_JSON)
     public List<StateAndRef<Basket>> baskets() {
         return rpcOps.vaultQuery(Basket.class).getStates();
