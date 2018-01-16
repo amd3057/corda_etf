@@ -24,7 +24,7 @@ public class Product implements OwnableState {
     private final String state;
     private final double marketValue;
     private final double notionalValue;
-    private final OurMap<String, Integer> productMap;
+    private final List<ProductQty> productMap;
     private final AbstractParty owner;
 
     // dynamic - to be sent from the client
@@ -52,7 +52,7 @@ public class Product implements OwnableState {
 
      public Product(String ticker, String sedol, String assetClass, String productType, String name, String sector,
              String exchange, String state, double marketValue, double notionalValue,
-                    OurMap<String, Integer> productMap, AbstractParty owner, String isin, double price, Integer quantity) {
+                    List<ProductQty> productQtys, AbstractParty owner, String isin, double price, Integer quantity) {
 
         this.ticker = ticker;
         this.sedol = sedol;
@@ -64,7 +64,7 @@ public class Product implements OwnableState {
         this.state = state;
         this.marketValue = marketValue;
         this.notionalValue = notionalValue;
-        this.productMap = productMap;
+        this.productMap = productQtys;
         this.owner = owner;
         this.isin = isin;
         this.price = price;
@@ -115,7 +115,7 @@ public class Product implements OwnableState {
         return notionalValue;
     }
 
-    public Map<String, Integer> getProductMap() {
+    public List<ProductQty> getProductMap() {
         return productMap;
     }
 

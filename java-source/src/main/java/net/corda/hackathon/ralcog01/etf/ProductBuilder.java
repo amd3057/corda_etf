@@ -15,19 +15,19 @@ public enum ProductBuilder {
          if ("AAPL".equals(ticker)) {
              return new Product("AAPL","AAPL123", "Equity", "STOCK",
                       "Apple", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
-                     10000.00, 10000.00, new Product.OurMap<>(), owner, "APPL.X", price, quantity);
+                     10000.00, 10000.00, new ArrayList<>(), owner, "APPL.X", price, quantity);
          }
         if ("ETF".equals(ticker)) {
-            Product.OurMap<String,Integer> maps = new Product.OurMap<>();
-            maps.put("AAPL",100);
-            maps.put("MSFT",100);
-            maps.put("AMZN",100);
-            maps.put("FB",100);
-            maps.put("BRK.B",100);
+            List<ProductQty> list = new ArrayList<>();
+            list.add(new ProductQty("AAPL",100);
+            list.add(new ProductQty("MSFT",100);
+            list.add(new ProductQty("AMZN",100);
+            list.add(new ProductQty("FB",100);
+            list.add(new ProductQty("BRK.B",100);
 
             return new Product("SNY5","SNY5123", "Equity", "ETF",
                     "SNY5", "SNP 5", "NYSE", ProductState.ACTIVE.name(),
-                    10000.00, 10000.00, maps, owner, "SNY5.X", price, quantity);
+                    10000.00, 10000.00, list, owner, "SNY5.X", price, quantity);
         }
          return null;
     }
