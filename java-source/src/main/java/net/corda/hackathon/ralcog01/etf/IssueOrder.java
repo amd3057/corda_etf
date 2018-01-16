@@ -92,7 +92,7 @@ public class IssueOrder {
             //return subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
             subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
 
-            Party apAgent = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("AP", "New York", "US"));
+            Party apAgent = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("AA", "New York", "US"));
             return subFlow(new DeliverBasketFlow(basket, apAgent));
 
         }
