@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
 
 public class Product implements OwnableState {
 
@@ -22,7 +22,7 @@ public class Product implements OwnableState {
     private final String state;
     private final double marketValue;
     private final double notionalValue;
-    private final Set<Product> products;
+    private final Map<String, Integer> productMap;
     private final AbstractParty owner;
 
     // dynamic - to be sent from the client
@@ -48,7 +48,10 @@ public class Product implements OwnableState {
         return ImmutableList.of(owner);
     }
 
-     Product(String ticker, String sedol, String assetClass, String productType, String name, String sector, String exchange, String state, double marketValue, double notionalValue, Set<Product> products, AbstractParty owner, String isin, double price, Integer quantity) {
+     Product(String ticker, String sedol, String assetClass, String productType, String name, String sector,
+             String exchange, String state, double marketValue, double notionalValue,
+             Map<String, Integer> productMap, AbstractParty owner, String isin, double price, Integer quantity) {
+
         this.ticker = ticker;
         this.sedol = sedol;
         this.assetClass = assetClass;
@@ -59,7 +62,7 @@ public class Product implements OwnableState {
         this.state = state;
         this.marketValue = marketValue;
         this.notionalValue = notionalValue;
-        this.products = products;
+        this.productMap = productMap;
         this.owner = owner;
         this.isin = isin;
         this.price = price;
@@ -110,8 +113,8 @@ public class Product implements OwnableState {
         return notionalValue;
     }
 
-    public Set<Product> getProducts() {
-        return products;
+    public Map<String, Integer> getProductMap() {
+        return productMap;
     }
 
     public String getIsin() {
@@ -137,5 +140,13 @@ public class Product implements OwnableState {
     @Override
     public int hashCode() {
         return Objects.hash(getTicker());
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "ticker='" + ticker + '\'' +
+                ", quantity=" + quantity +
+                '}';
     }
 }
