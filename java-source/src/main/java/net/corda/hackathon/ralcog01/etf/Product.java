@@ -48,7 +48,7 @@ public class Product implements OwnableState {
         return ImmutableList.of(owner);
     }
 
-     Product(String ticker, String sedol, String assetClass, String productType, String name, String sector,
+     public Product(String ticker, String sedol, String assetClass, String productType, String name, String sector,
              String exchange, String state, double marketValue, double notionalValue,
              Map<String, Integer> productMap, AbstractParty owner, String isin, double price, Integer quantity) {
 
