@@ -76,7 +76,7 @@ public class IssueOrder {
     }
 
     @GET
-    @Path("products")
+    @Path("baskets")
     @Produces(MediaType.APPLICATION_JSON)
     public List<StateAndRef<Basket>> baskets() {
         return rpcOps.vaultQuery(Basket.class).getStates();
