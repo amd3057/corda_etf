@@ -15,11 +15,11 @@ public class Product implements OwnableState {
     private final String ticker;
     private final String sedol;
     private final String assetClass;
-    private final ProductType productType;
+    private final String productType;
     private final String name;
     private final String sector;
     private final String exchange;
-    private final ProductState state;
+    private final String state;
     private final double marketValue;
     private final double notionalValue;
     private final Set<Product> products;
@@ -48,7 +48,7 @@ public class Product implements OwnableState {
         return ImmutableList.of(owner);
     }
 
-     Product(String ticker, String sedol, String assetClass, ProductType productType, String name, String sector, String exchange, ProductState state, double marketValue, double notionalValue, Set<Product> products, AbstractParty owner, String isin, double price, Integer quantity) {
+     Product(String ticker, String sedol, String assetClass, String productType, String name, String sector, String exchange, String state, double marketValue, double notionalValue, Set<Product> products, AbstractParty owner, String isin, double price, Integer quantity) {
         this.ticker = ticker;
         this.sedol = sedol;
         this.assetClass = assetClass;
@@ -82,7 +82,7 @@ public class Product implements OwnableState {
         return assetClass;
     }
 
-    public ProductType getProductType() {
+    public String getProductType() {
         return productType;
     }
 
@@ -98,7 +98,7 @@ public class Product implements OwnableState {
         return exchange;
     }
 
-    public ProductState getState() {
+    public String getState() {
         return state;
     }
 

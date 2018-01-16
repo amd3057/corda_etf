@@ -12,7 +12,8 @@ public enum ProductBuilder {
 
     static Product setAndGetProductStaticData(final String ticker, final double price, final Integer quantity, AbstractParty owner) {
          if ("AAPL".equals(ticker)) {
-             return new Product("AAPL","", "Equity", ProductType.STOCK, "Apple", "", "NYSE", ProductState.ACTIVE,
+             return new Product("AAPL","", "Equity", "STOCK", "Apple", "", "NYSE"
+                     , ProductState.ACTIVE.name(),
                      10000.00, 10000.00, Collections.EMPTY_SET, owner, "", price, quantity);
          }
          return null;

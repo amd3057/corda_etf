@@ -10,7 +10,7 @@ import static net.corda.core.contracts.ContractsDSL.requireSingleCommand;
 // Replace TemplateContract's definition with:
 public class ProductContract implements Contract {
 
-    public static final String PRODUCT_CONTRACT_ID = "net.corda.hackathon.ralcog01.etf.state.ProductContract";
+    public static final String PRODUCT_CONTRACT_ID = "net.corda.hackathon.ralcog01.etf.ProductContract";
 
     // Our Create command.
     public static class Create implements CommandData {
