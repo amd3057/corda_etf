@@ -19,11 +19,11 @@ public enum ProductBuilder {
          }
         if ("ETF".equals(ticker)) {
             List<ProductQty> list = new ArrayList<>();
-            list.add(new ProductQty("AAPL",100);
-            list.add(new ProductQty("MSFT",100);
-            list.add(new ProductQty("AMZN",100);
-            list.add(new ProductQty("FB",100);
-            list.add(new ProductQty("BRK.B",100);
+            list.add(new ProductQty("AAPL",100));
+            list.add(new ProductQty("MSFT",100));
+            list.add(new ProductQty("AMZN",100));
+            list.add(new ProductQty("FB",100));
+            list.add(new ProductQty("BRK.B",100));
 
             return new Product("SNY5","SNY5123", "Equity", "ETF",
                     "SNY5", "SNP 5", "NYSE", ProductState.ACTIVE.name(),

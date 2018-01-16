@@ -5,6 +5,7 @@ import net.corda.core.contracts.CommandWithParties;
 import net.corda.core.contracts.Contract;
 import net.corda.core.transactions.LedgerTransaction;
 
+import java.util.List;
 import java.util.Map;
 
 import static net.corda.core.contracts.ContractsDSL.requireSingleCommand;
@@ -31,11 +32,11 @@ public class DepositToAPContract implements Contract {
             // IOU-specific constraints.
             final Product out = tx.outputsOfType(Product.class).get(0);
             final int etfQuantity = out.getQuantity();
-            final Map<String, Integer> etfProductMap = out.getProductMap();
+            final List<ProductQty> etfProductMap = out.getProductMap();
 
             final Basket outBasket = tx.outputsOfType(Basket.class).get(0);
             final int reqEtf = outBasket.getReqProduct().getQuantity();
-            final Map<String, Integer> reqProductMap = outBasket.getReqProduct().getProductMap();
+            final List<ProductQty> reqProductMap = outBasket.getReqProduct().getProductMap();
 
             check.using("Requested and created quantities are not matching.", etfQuantity == reqEtf);
             check.using("Underlying ETF composition is niot matching", etfProductMap.equals(reqProductMap));

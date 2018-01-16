@@ -119,7 +119,7 @@ public class IssueOrder {
 
         List<ProductQty> lists= new ArrayList<>();
         for (Product p : underlying) {
-            lists.add(new ProductQty(p.getTicker(), p.getQuantity());
+            lists.add(new ProductQty(p.getTicker(), p.getQuantity()));
         }
 
         return new Product("SNY5","SNY5Sd", "Equity", "ETF",
