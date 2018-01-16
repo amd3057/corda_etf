@@ -66,4 +66,20 @@ public class Basket implements LinearState {
                 "reqProduct=" + reqProduct.toString() +
                 '}';
     }
+
+    public AbstractParty getIssuer() {
+        return issuer;
+    }
+
+    public AbstractParty getOwner() {
+        return owner;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public Product getReqProduct() {
+        return reqProduct;
+    }
 }
