@@ -8,6 +8,7 @@ import net.corda.core.flows.CollectSignaturesFlow;
 import net.corda.core.flows.FinalityFlow;
 import net.corda.core.flows.FlowException;
 import net.corda.core.flows.FlowSession;
+import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
@@ -72,6 +73,11 @@ public class DeliverBasketFlow extends OrderBaseFlow {
 
 // Finalising the transaction.
         subFlow(new FinalityFlow(fullySignedTx));
+
+// Call the validation and notify sponsor flow
+        Party etfSponsor = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("ES", "New York", "US"));
+        Party participatingAccount = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PA", "New York", "US"));
+        subFlow(new ValidateAndNotifySponsorFlow(newBasket, etfCustodian, etfSponsor, participatingAccount));
 
         return null;
     }
