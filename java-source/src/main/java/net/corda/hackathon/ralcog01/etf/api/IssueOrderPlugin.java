@@ -15,7 +15,7 @@ public class IssueOrderPlugin implements WebServerPluginRegistry {
     private final List<Function<CordaRPCOps, ?>> webApis = ImmutableList.of(IssueOrder::new);
 
     private final Map<String, String> staticServeDirs = ImmutableMap.of(
-            "obligation", getClass().getClassLoader().getResource("obligationWeb").toExternalForm()
+            "obligation", getClass().getClassLoader().getResource("etfweb").toExternalForm()
     );
 
     @Override

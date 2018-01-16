@@ -117,14 +117,14 @@ public class IssueOrder {
     }
     private   Product createETF(final String ticker, final Integer quantity, Set<Product> underlying,AbstractParty owner) {
 
-        Product.OurMap<String, Integer> newMap = new Product.OurMap<>();
+        List<ProductQty> lists= new ArrayList<>();
         for (Product p : underlying) {
-            newMap.put(p.getTicker(), p.getQuantity());
+            lists.add(new ProductQty(p.getTicker(), p.getQuantity());
         }
 
         return new Product("SNY5","SNY5Sd", "Equity", "ETF",
                 "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
-                10.00, 10.00, newMap, owner, "SNY5.X", 10.00, quantity);
+                10.00, 10.00, lists, owner, "SNY5.X", 10.00, quantity);
 
     }
 
