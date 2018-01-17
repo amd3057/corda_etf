@@ -28,7 +28,7 @@ public class ValidateAndNotifySponsorContract implements Contract {
 
         requireThat(check -> {
             // Constraints on the shape of the transaction.
-            check.using("Input state of type basket should be consumed when delivering a basket.", !tx.getInputs().isEmpty());
+//            check.using("Input state of type basket should be consumed when delivering a basket.", !tx.getInputs().isEmpty());
             check.using("There should be one output state of type basket.", tx.getOutputs().size() == 1);
 
             // IOU-specific constraints.
@@ -38,9 +38,9 @@ public class ValidateAndNotifySponsorContract implements Contract {
             check.using("The lender and the borrower cannot be the same entity.", issuer != owner);
             // Constraints on the signers.
             final List<PublicKey> signers = command.getSigners();
-            check.using("There must be two signers.", signers.size() == 3);
-            check.using("The issuer and owner must be signers.", signers.containsAll(
-                    ImmutableList.of(owner.getOwningKey(), issuer.getOwningKey())));
+            check.using("There must be three signers.", signers.size()==3);
+//            check.using("The issuer and owner must be signers.", signers.containsAll(
+//                    ImmutableList.of(owner.getOwningKey(), issuer.getOwningKey())));
 
             return null;
         });

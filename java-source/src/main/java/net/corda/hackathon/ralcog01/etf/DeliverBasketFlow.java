@@ -73,9 +73,9 @@ public class DeliverBasketFlow extends OrderBaseFlow {
         subFlow(new FinalityFlow(fullySignedTx));
 
 // Call the validation and notify sponsor flow
-        Party etfSponsor = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyB", "New York", "US"));
-        Party participatingAccount = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PA", "New York", "US"));
-        subFlow(new ValidateAndNotifySponsorFlow(newBasket, etfCustodian, etfSponsor, participatingAccount));
+//        Party etfSponsor = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyB", "New York", "US"));
+//        Party participatingAccount = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PA", "New York", "US"));
+//        subFlow(new ValidateAndNotifySponsorFlow(newBasket, etfCustodian, etfSponsor, participatingAccount));
 
         return null;
     }
