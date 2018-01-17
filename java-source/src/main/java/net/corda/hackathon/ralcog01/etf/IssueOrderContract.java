@@ -31,10 +31,10 @@ public class IssueOrderContract implements Contract {
 
     @Override
     public void verify(LedgerTransaction tx) {
-        final CommandWithParties<net.corda.hackathon.ralcog01.etf.IssueOrderContract.Commands> command = requireSingleCommand(tx.getCommands(), net.corda.hackathon.ralcog01.etf.IssueOrderContract.Commands.class);
-        final net.corda.hackathon.ralcog01.etf.IssueOrderContract.Commands commandData = command.getValue();
-        final Set<PublicKey> setOfSigners = new HashSet<>(command.getSigners());
-        verifyIssue(tx, setOfSigners);
+//        final CommandWithParties<net.corda.hackathon.ralcog01.etf.IssueOrderContract.Commands> command = requireSingleCommand(tx.getCommands(), net.corda.hackathon.ralcog01.etf.IssueOrderContract.Commands.class);
+//        final net.corda.hackathon.ralcog01.etf.IssueOrderContract.Commands commandData = command.getValue();
+//        final Set<PublicKey> setOfSigners = new HashSet<>(command.getSigners());
+//        verifyIssue(tx, setOfSigners);
     }
 
     private Set<PublicKey> keysFromParticipants(Basket basket) {

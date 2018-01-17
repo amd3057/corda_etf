@@ -114,8 +114,8 @@ public class IssueOrder {
             Basket basket = new Basket(myIdentity, lenderIdentity, products, reqEtf);
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
             flowHandle.getReturnValue().get();
-
-            return Response.status(CREATED).entity("Success").build();
+            final String msg = String.format("ETF Delivered to Participant Account and updated to ledger.\n");
+            return Response.status(CREATED).entity(msg).build();
         } catch (Exception ex) {
             StringWriter errors = new StringWriter();
             ex.printStackTrace(new PrintWriter(errors));
@@ -141,8 +141,9 @@ public class IssueOrder {
 
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(ValidateAndNotifySponsorFlow.class, linearId, lenderIdentity);
             flowHandle.getReturnValue().get();
+            final String msg = String.format("Basket Delivered to ETF Custodian and updated to ledger.\n");
+            return Response.status(CREATED).entity(msg).build();
 
-            return Response.status(CREATED).entity("Success").build();
         } catch (Exception ex) {
             StringWriter errors = new StringWriter();
             ex.printStackTrace(new PrintWriter(errors));

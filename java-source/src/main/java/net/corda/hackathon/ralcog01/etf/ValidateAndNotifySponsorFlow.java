@@ -86,9 +86,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), participantAccount.getOwningKey());
         Command cmd = new Command<>(new ValidateAndNotifySponsorContract.Create(), requiredSigners);
 
-
 // We add the items to the builder.
-        txBuilder.withItems(outputContractAndState, cmd);
+        txBuilder.withItems(obligationToTransfer,outputContractAndState, cmd);
 
 // Verifying the transaction.
         txBuilder.verify(getServiceHub());
