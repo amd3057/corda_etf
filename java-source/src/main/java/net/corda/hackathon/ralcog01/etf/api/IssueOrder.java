@@ -94,19 +94,26 @@ public class IssueOrder {
             lists.add(new ProductQty(p.getTicker(), p.getQuantity()));
         }
 
-        // 1. Get party objects for the counterparty.
-        final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
-        if (lenderIdentities.size() != 1) {
-            final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
-            throw new IllegalStateException(errMsg);
-        }
-        final Party lenderIdentity = lenderIdentities.iterator().next();
-
-        Product product = new Product("SNY5", "SNY5Sd", "Equity", "ETF",
-                "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
-                10.00, 10.00, lists, lenderIdentity, "SNY5.X", 10.00, 50000);
         List<Product> products = new ArrayList<>();
-        products.add(product);
+        if(myIdentity.getName().getOrganisation().equals("PartyA")) {
+            // 1. Get party objects for the counterparty.
+            final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
+            if (lenderIdentities.size() != 1) {
+                final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
+                throw new IllegalStateException(errMsg);
+            }
+            final Party lenderIdentity = lenderIdentities.iterator().next();
+
+            Product product = new Product("SNY5", "SNY5Sd", "Equity", "ETF",
+                    "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
+                    10.00, 10.00, lists, lenderIdentity, "SNY5.X", 10.00, 50000);
+
+            products.add(product);
+        }
+        else
+        {
+            products.addAll(rpcOps.vaultQuery(Product.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList()));
+        }
        return  products;
     }
 
@@ -146,7 +153,7 @@ public class IssueOrder {
             }
             final Party lenderIdentity = lenderIdentities.iterator().next();
 
-            Product reqEtf = createETF(ticker, Integer.parseInt(requestedQty), products, myIdentity);
+            Product reqEtf = createETF(ticker, 250000, products, myIdentity);
             Basket basket = new Basket(myIdentity, lenderIdentity, products, reqEtf);
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
             flowHandle.getReturnValue().get();
