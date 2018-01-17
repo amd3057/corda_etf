@@ -1,5 +1,8 @@
 package net.corda.hackathon.ralcog01.etf;
 
+import net.corda.core.serialization.CordaSerializable;
+
+@CordaSerializable
 public class ProductQty {
     public int getQuantity() {
         return quantity;
