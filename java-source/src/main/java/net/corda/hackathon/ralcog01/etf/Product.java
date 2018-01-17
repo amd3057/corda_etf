@@ -7,10 +7,12 @@ import net.corda.core.identity.AbstractParty;
 import net.corda.core.serialization.CordaSerializable;
 import org.jetbrains.annotations.NotNull;
 
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Product implements OwnableState {
 
@@ -153,7 +155,7 @@ public class Product implements OwnableState {
     }
 
 
-    @CordaSerializable
-    public static class OurMap<String, Integer>  extends HashMap<String, Integer> {
+    public List<PublicKey> getParticipantKeys() {
+        return getParticipants().stream().map(AbstractParty::getOwningKey).collect(Collectors.toList());
     }
 }
