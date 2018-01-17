@@ -103,7 +103,7 @@ public class IssueOrder {
                 .collect(Collectors.toSet());
 
         // 1. Get party objects for the counterparty.
-        final Set<Party> lenderIdentities = rpcOps.partiesFromName("CC", false);
+        final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
         if (lenderIdentities.size() != 1) {
             final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
             throw new IllegalStateException(errMsg);
@@ -112,7 +112,16 @@ public class IssueOrder {
 
         Product etf= createETF(ticker,Integer.parseInt(requestedQty),products,myIdentity);
         Basket basket = new Basket(myIdentity,lenderIdentity,products,etf);
-        return Response.status(CREATED).entity("Test").build();
+        try {
+            final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket,lenderIdentity);
+
+            final SignedTransaction result = flowHandle.getReturnValue().get();
+            final String msg = String.format("Transaction id %s committed to ledger.\n%s",
+                    result.getId(), result.getTx().getOutputStates().get(0));
+            return Response.status(CREATED).entity(msg).build();
+        } catch (Exception e) {
+            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+        }
 
     }
     private   Product createETF(final String ticker, final Integer quantity, Set<Product> underlying,AbstractParty owner) {

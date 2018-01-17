@@ -16,7 +16,7 @@ import java.security.PublicKey;
 import java.time.Duration;
 import java.util.List;
 
-public class IssueOrder {
+public class IssueOrderFlow {
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends OrderBaseFlow {
@@ -122,7 +122,7 @@ public class IssueOrder {
         }
     }
 
-    @InitiatedBy(net.corda.hackathon.ralcog01.etf.IssueOrder.Initiator.class)
+    @InitiatedBy(IssueOrderFlow.Initiator.class)
     public static class Responder extends FlowLogic<SignedTransaction> {
         private final FlowSession otherFlow;
 

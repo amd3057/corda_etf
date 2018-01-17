@@ -21,6 +21,7 @@ import java.util.List;
  * An abstract FlowLogic class that is subclassed by the product flows to
  * provide helper methods and classes.
  */
+
 abstract class OrderBaseFlow extends FlowLogic<SignedTransaction> {
 
     Party getFirstNotary() throws FlowException {
