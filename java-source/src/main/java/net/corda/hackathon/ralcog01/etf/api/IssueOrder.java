@@ -1,7 +1,6 @@
 package net.corda.hackathon.ralcog01.etf.api;
 
 
-
 import com.google.common.collect.ImmutableMap;
 import net.corda.core.contracts.Amount;
 import net.corda.core.contracts.StateAndRef;
@@ -11,14 +10,7 @@ import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowHandle;
 import net.corda.core.transactions.SignedTransaction;
-import net.corda.core.utilities.OpaqueBytes;
-import net.corda.examples.obligation.Obligation;
-import net.corda.examples.obligation.flows.IssueObligation;
-import net.corda.examples.obligation.flows.SettleObligation;
-import net.corda.examples.obligation.flows.TransferObligation;
-import net.corda.finance.contracts.asset.Cash;
-import net.corda.finance.flows.AbstractCashFlow;
-import net.corda.finance.flows.CashIssueFlow;
+
 import net.corda.hackathon.ralcog01.etf.*;
 
 import javax.ws.rs.GET;
@@ -68,25 +60,10 @@ public class IssueOrder {
     @GET
     @Path("products")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StateAndRef<Product>> products() {
-        return rpcOps.vaultQuery(Product.class).getStates();
+    public List<Product> products(@QueryParam(value = "type") String type) {
+
+        return rpcOps.vaultQuery(Product.class).getStates().stream().filter((p) -> p.getState().getData().getProductType().equals(ProductType.valueOf(type))).map((p) -> p.getState().getData()).collect(Collectors.toList());
     }
-
-    @GET
-    @Path("etfs")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Product> etfs() {
-        return rpcOps.vaultQuery(Product.class).getStates().stream().filter((p)->p.getState().getData().getProductType().equals(ProductType.ETF.name())).map((p)->p.getState().getData()).collect(Collectors.toList());
-    }
-
-
-    @GET
-    @Path("baskets")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<StateAndRef<Basket>> baskets() {
-        return rpcOps.vaultQuery(Basket.class).getStates();
-    }
-
 
     @GET
     @Path("create")
@@ -99,7 +76,7 @@ public class IssueOrder {
         //Prepare basket
 
         Stream<StateAndRef<Product>> productsStream = rpcOps.vaultQuery(Product.class).getStates().stream();
-        Set<Product> products =productsStream.filter((p)->basketproducts.contains((p.getState().getData().getTicker()))).map((p)->p.getState().getData())
+        Set<Product> products = productsStream.filter((p) -> basketproducts.contains((p.getState().getData().getTicker()))).map((p) -> p.getState().getData())
                 .collect(Collectors.toSet());
 
         // 1. Get party objects for the counterparty.
@@ -110,10 +87,10 @@ public class IssueOrder {
         }
         final Party lenderIdentity = lenderIdentities.iterator().next();
 
-        Product etf= createETF(ticker,Integer.parseInt(requestedQty),products,myIdentity);
-        Basket basket = new Basket(myIdentity,lenderIdentity,products,etf);
+        Product etf = createETF(ticker, Integer.parseInt(requestedQty), products, myIdentity);
+        Basket basket = new Basket(myIdentity, lenderIdentity, products, etf);
         try {
-            final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket,lenderIdentity);
+            final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
 
             final SignedTransaction result = flowHandle.getReturnValue().get();
             final String msg = String.format("Transaction id %s committed to ledger.\n%s",
@@ -124,14 +101,15 @@ public class IssueOrder {
         }
 
     }
-    private   Product createETF(final String ticker, final Integer quantity, Set<Product> underlying,AbstractParty owner) {
 
-        List<ProductQty> lists= new ArrayList<>();
+    private Product createETF(final String ticker, final Integer quantity, Set<Product> underlying, AbstractParty owner) {
+
+        List<ProductQty> lists = new ArrayList<>();
         for (Product p : underlying) {
             lists.add(new ProductQty(p.getTicker(), p.getQuantity()));
         }
 
-        return new Product("SNY5","SNY5Sd", "Equity", "ETF",
+        return new Product("SNY5", "SNY5Sd", "Equity", "ETF",
                 "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
                 10.00, 10.00, lists, owner, "SNY5.X", 10.00, quantity);
 
