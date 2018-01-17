@@ -75,6 +75,26 @@ public class Product implements OwnableState {
         this.quantity = quantity;
     }
 
+
+    public Product(Product product,AbstractParty party) {
+
+        this.ticker = product.ticker;
+        this.sedol = product.sedol;
+        this.assetClass =product.assetClass;
+        this.productType = product.productType;
+        this.name = product.name;
+        this.sector = product.sector;
+        this.exchange = product.exchange;
+        this.state = product.state;
+        this.marketValue = product.marketValue;
+        this.notionalValue = product.notionalValue;
+        this.productMap = product.getProductMap();
+        this.isin = product.isin;
+        this.price = product.price;
+        this.owner = party;
+        this.quantity = product.quantity;
+    }
+
     static Product createProduct (String ticker, AbstractParty owner, final double price, final Integer quantity) {
         return ProductBuilder.setAndGetProductStaticData(ticker, price, quantity, owner);
     }

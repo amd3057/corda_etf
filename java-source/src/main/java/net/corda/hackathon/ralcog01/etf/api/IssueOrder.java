@@ -2,21 +2,12 @@ package net.corda.hackathon.ralcog01.etf.api;
 
 
 import com.google.common.collect.ImmutableMap;
-import javafx.beans.property.ListProperty;
-import net.corda.core.contracts.Amount;
-import net.corda.core.contracts.ContractState;
-import net.corda.core.contracts.StateAndRef;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowHandle;
-import net.corda.core.node.services.Vault;
-import net.corda.core.node.services.vault.Builder;
-import net.corda.core.node.services.vault.CriteriaExpression;
-import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
-
 import net.corda.hackathon.ralcog01.etf.*;
 
 import javax.ws.rs.GET;
@@ -27,15 +18,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
-import static net.corda.finance.contracts.GetBalances.getCashBalances;
 
 @Path("order")
 public class IssueOrder {
@@ -72,6 +63,48 @@ public class IssueOrder {
     public List<Product> products() {
 
         return rpcOps.vaultQuery(Product.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList());
+    }
+
+    @GET
+    @Path("baskets")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> baskets() {
+
+        return rpcOps.vaultQuery(Basket.class).getStates().stream().map((p) -> p.getState().getData().getLinearId().toString()).collect(Collectors.toList());
+    }
+
+
+
+    @GET
+    @Path("etfs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Product etfs() {
+
+        //return rpcOps.vaultQuery(Product.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList());
+        List<Product> underlying = new ArrayList<>();
+
+        underlying.add(ProductBuilder.setAndGetProductStaticData("AAPL",175.00,100,myIdentity));
+        underlying.add(ProductBuilder.setAndGetProductStaticData("MSFT",475.00,100,myIdentity));
+        underlying.add(ProductBuilder.setAndGetProductStaticData("AMZN",189.00,100,myIdentity));
+        underlying.add(ProductBuilder.setAndGetProductStaticData("FB",115.00,100,myIdentity));
+        underlying.add(ProductBuilder.setAndGetProductStaticData("BRK.B",96.00,100,myIdentity));
+
+        List<ProductQty> lists = new ArrayList<>();
+        for (Product p : underlying) {
+            lists.add(new ProductQty(p.getTicker(), p.getQuantity()));
+        }
+
+        // 1. Get party objects for the counterparty.
+        final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
+        if (lenderIdentities.size() != 1) {
+            final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
+            throw new IllegalStateException(errMsg);
+        }
+        final Party lenderIdentity = lenderIdentities.iterator().next();
+
+        return new Product("SNY5", "SNY5Sd", "Equity", "ETF",
+                "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
+                10.00, 10.00, lists, lenderIdentity, "SNY5.X", 10.00, 50000);
     }
 
     @GET
@@ -115,7 +148,8 @@ public class IssueOrder {
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
             flowHandle.getReturnValue().get();
 
-            return Response.status(CREATED).entity("Success").build();
+            final String msg = String.format("Basket Delivered to ETF Custodian and updated to ledger.\n");
+            return Response.status(CREATED).entity(msg).build();
         } catch (Exception ex) {
             StringWriter errors = new StringWriter();
             ex.printStackTrace(new PrintWriter(errors));
@@ -141,8 +175,9 @@ public class IssueOrder {
 
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(ValidateAndNotifySponsorFlow.class, linearId, lenderIdentity);
             flowHandle.getReturnValue().get();
+            final String msg = String.format("ETF Delivered to Participant Account and updated to ledger.\n");
+            return Response.status(CREATED).entity(msg).build();
 
-            return Response.status(CREATED).entity("Success").build();
         } catch (Exception ex) {
             StringWriter errors = new StringWriter();
             ex.printStackTrace(new PrintWriter(errors));
