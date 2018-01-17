@@ -17,6 +17,33 @@ public enum ProductBuilder {
                       "Apple", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
                      10000.00, 10000.00, new ArrayList<>(), owner, "APPL.X", price, quantity);
          }
+
+
+        if ("MSFT".equals(ticker)) {
+            return new Product("MSFT","MSFT123", "Equity", "STOCK",
+                    "Microsoft", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
+                    5000.00, 5000.00, new ArrayList<>(), owner, "MSFT.X", price, quantity);
+        }
+
+        if ("AMZN".equals(ticker)) {
+            return new Product("AMZN","AMZNT123", "Equity", "STOCK",
+                    "Amazon", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
+                    5000.00, 5000.00, new ArrayList<>(), owner, "AMZN.X", price, quantity);
+        }
+
+        if ("FB".equals(ticker)) {
+            return new Product("FB","FB123", "Equity", "STOCK",
+                    "Facebook", "Social Media", "NYSE", ProductState.ACTIVE.name(),
+                    2500.00, 2500.00, new ArrayList<>(), owner, "FB.X", price, quantity);
+        }
+
+        if ("BRK.B".equals(ticker)) {
+            return new Product("BRK.B","BRK.B123", "Equity", "STOCK",
+                    "Blackrock", "Financial Services", "NYSE", ProductState.ACTIVE.name(),
+                    2000.00, 2000.00, new ArrayList<>(), owner, "BRK.B", price, quantity);
+        }
+
+
         if ("ETF".equals(ticker)) {
             List<ProductQty> list = new ArrayList<>();
             list.add(new ProductQty("AAPL",100));
