@@ -1,7 +1,7 @@
 "use strict";
 
 // Define your backend here.
-angular.module('demoAppModule', ['ui.bootstrap']).controller('DemoAppCtrl', function($http, $location, $uibModal) {
+angular.module('demoAppModule', ['ui.bootstrap']).controller('DemoAppCtrl', function($http, $location, $uibModal,$scope) {
     const demoApp = this;
 
     const apiBaseURL = "/api/obligation/";
@@ -40,9 +40,28 @@ angular.module('demoAppModule', ['ui.bootstrap']).controller('DemoAppCtrl', func
 
         issueCashModal.result.then(() => {}, () => {});
     };
-
+    
+    
+    
+    demoApp.confirmLinearId = (index) =>{
+    	$http.get("/api/order/confirm?linerId="+$scope.linerIds[index]).then(
+                (result) => transferModal.displayMessage(result),
+                (result) => transferModal.displayMessage(result)
+            );
+    }
+    
+    
+    $scope.loadFromMenu = function(index){
+    	console.log("in load Form")
+    	alert(index);
+    }
+    
     /** Displays the IOU transfer modal. */
-    demoApp.openTransferModal = (id) => {
+    demoApp.openTransferModal = (id,index) => {
+    	$scope.showitem = $scope.productList[index];
+    	
+    	console.log('In Method'+$scope.showitem.ticker);
+    	
         const transferModal = $uibModal.open({
             templateUrl: 'transferModal.html',
             controller: 'TransferModalCtrl',
@@ -50,7 +69,8 @@ angular.module('demoAppModule', ['ui.bootstrap']).controller('DemoAppCtrl', func
             resolve: {
                 apiBaseURL: () => apiBaseURL,
                 peers: () => peers,
-                id: () => id
+                id: () => id,
+                selectedItem: () => $scope.productList[index]
             }
         });
 
@@ -71,16 +91,23 @@ angular.module('demoAppModule', ['ui.bootstrap']).controller('DemoAppCtrl', func
 
         settleModal.result.then(() => {}, () => {});
     };
-
+    $scope.productList = [];
+    $scope.linerIds =[];
     /** Refreshes the front-end. */
     demoApp.refresh = () => {
         // Update the list of IOUs.
-        $http.get(apiBaseURL + "obligations").then((response) => demoApp.ious =
-            Object.keys(response.data).map((key) => response.data[key].state.data));
+        $http.get("/api/order/etfs").then(
+        		function(response){
+        			console.log(response.data);
+        			 $scope.productList = response.data;
+        		});
 
         // Update the cash balances.
-        $http.get(apiBaseURL + "cash-balances").then((response) => demoApp.cashBalances =
-            response.data);
+        $http.get("/api/order/baskets").then(
+        		function(response){
+        			console.log(response.data);
+        			 $scope.linerIds = response.data;
+        		});
     }
 
     demoApp.refresh();
