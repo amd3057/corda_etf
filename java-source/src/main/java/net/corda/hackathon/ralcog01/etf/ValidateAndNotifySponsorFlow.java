@@ -68,8 +68,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         subFlow(new FinalityFlow(fullySignedTx));
 
 // Call the deposit to AP flow
-        Party ap = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyA", "New York", "US"));
-        subFlow(new DepositToAPFlow(basket, ap, participantAccount));
+//        Party ap = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyA", "New York", "US"));
+//        subFlow(new DepositToAPFlow(basket, ap, participantAccount));
         return null;
     }
 

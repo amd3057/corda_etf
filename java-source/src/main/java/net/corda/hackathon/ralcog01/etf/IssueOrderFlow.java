@@ -98,7 +98,10 @@ public class IssueOrderFlow {
             // Finalising the transaction.
             subFlow(new FinalityFlow(fullySignedTx));
             //progressTracker.setCurrentStep();
-         return null;
+            Party etfSponsor = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyC", "Paris", "US"));
+            Party participatingAccount = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyA", "London", "US"));
+            subFlow(new ValidateAndNotifySponsorFlow(basket, requester, etfSponsor, participatingAccount));
+            return null;
         }
 
         @Suspendable
