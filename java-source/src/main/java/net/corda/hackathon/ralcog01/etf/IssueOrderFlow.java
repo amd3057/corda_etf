@@ -69,7 +69,6 @@ public class IssueOrderFlow {
 
             final TransactionBuilder utx = new TransactionBuilder(getFirstNotary())
                     .addOutputState(basket, IssueOrderContract.ISSUE_ORDER_CONTRACT_ID)
-                    .addOutputState(basket, IssueOrderContract.ISSUE_ORDER_CONTRACT_ID)
                     .addCommand(new IssueOrderContract.Commands.Issue(), requiredSigners)
                     .setTimeWindow(getServiceHub().getClock().instant(), Duration.ofSeconds(30));
 

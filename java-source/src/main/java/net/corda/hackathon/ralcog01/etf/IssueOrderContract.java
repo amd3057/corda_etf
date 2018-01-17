@@ -47,13 +47,13 @@ public class IssueOrderContract implements Contract {
     // This only allows one basket issuance per transaction.
     private void verifyIssue(LedgerTransaction tx, Set<PublicKey> signers) {
         requireThat(req -> {
-            req.using("No inputs should be consumed when issuing an obligation.",
+            req.using("No inputs should be consumed when issuing an order.",
                     tx.getInputStates().isEmpty());
-            req.using("Only one obligation state should be created when issuing an obligation.", tx.getOutputStates().size() == 1);
+            req.using("Only one order state should be created when issuing an order.", tx.getOutputStates().size() == 1);
             Basket basket = (Basket) tx.getOutputStates().get(0);
             req.using("A newly issued basket must have a positive number of products.", basket.getProducts().size() > 0);
-            req.using("The lender and borrower cannot be the same identity.", !basket.getIssuer().equals(basket.getOwner()));
-            req.using("Both lender and borrower together only may sign obligation issue transaction.",
+            req.using("The issuer and owner cannot be the same identity.", !basket.getIssuer().equals(basket.getOwner()));
+            req.using("Both lender and borrower together only may sign issue order transaction.",
                     signers.equals(keysFromParticipants(basket)));
             return null;
         });
