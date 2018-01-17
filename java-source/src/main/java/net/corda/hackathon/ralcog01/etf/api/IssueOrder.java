@@ -95,9 +95,9 @@ public class IssueOrder {
         }
 
         List<Product> products = new ArrayList<>();
-        if(myIdentity.getName().getOrganisation().equals("PartyA")) {
+        if(myIdentity.getName().getOrganisation().equals("BankA")) {
             // 1. Get party objects for the counterparty.
-            final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
+            final Set<Party> lenderIdentities = rpcOps.partiesFromName("BankA", false);
             if (lenderIdentities.size() != 1) {
                 final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
                 throw new IllegalStateException(errMsg);
@@ -146,7 +146,7 @@ public class IssueOrder {
 
 
             // 1. Get party objects for the counterparty.
-            final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyB", false);
+            final Set<Party> lenderIdentities = rpcOps.partiesFromName("BankB", false);
             if (lenderIdentities.size() != 1) {
                 final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
                 throw new IllegalStateException(errMsg);
@@ -176,7 +176,7 @@ public class IssueOrder {
 
             final UniqueIdentifier linearId = UniqueIdentifier.Companion.fromString(id);
             // 1. Get party objects for the counterparty.
-            final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyC", false);
+            final Set<Party> lenderIdentities = rpcOps.partiesFromName("BankC", false);
             if (lenderIdentities.size() != 1) {
                 final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
                 throw new IllegalStateException(errMsg);
