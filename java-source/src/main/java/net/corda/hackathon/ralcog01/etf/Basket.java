@@ -16,11 +16,11 @@ public class Basket implements LinearState {
 
     private final AbstractParty issuer;
     private final AbstractParty owner;
-    private final Set<Product> products;
+    private final List<Product> products;
     private final Product reqProduct;
     private final UniqueIdentifier linearId;
 
-    public Basket(AbstractParty issuer, AbstractParty owner, Set<Product> products, Product reqProduct, UniqueIdentifier linearId) {
+    public Basket(AbstractParty issuer, AbstractParty owner, List<Product> products, Product reqProduct, UniqueIdentifier linearId) {
         this.issuer = issuer;
         this.owner = owner;
         this.products = products;
@@ -28,7 +28,7 @@ public class Basket implements LinearState {
         this.linearId = linearId;
     }
 
-    public Basket(AbstractParty issuer, AbstractParty owner, Set<Product> products, Product reqProduct) {
+    public Basket(AbstractParty issuer, AbstractParty owner, List<Product> products, Product reqProduct) {
         this.issuer = issuer;
         this.owner = owner;
         this.products = products;
@@ -77,7 +77,7 @@ public class Basket implements LinearState {
         return owner;
     }
 
-    public Set<Product> getProducts() {
+    public List<Product> getProducts() {
         return products;
     }
 
