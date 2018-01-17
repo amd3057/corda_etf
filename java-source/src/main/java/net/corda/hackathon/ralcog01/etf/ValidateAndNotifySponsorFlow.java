@@ -3,12 +3,15 @@ package net.corda.hackathon.ralcog01.etf;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndContract;
+import net.corda.core.contracts.StateAndRef;
+import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.flows.*;
 import net.corda.core.identity.CordaX500Name;
 import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
+import net.corda.examples.obligation.Obligation;
 
 import java.security.PublicKey;
 import java.util.List;
@@ -16,10 +19,11 @@ import java.util.List;
 @InitiatingFlow
 public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
-    private final Basket basket;
+    //private final Basket basket;
     //private final Party etfCustodian;
     //private final Party etfSponsor;
     private final Party participantAccount;
+    private final UniqueIdentifier linearId;
 
     private final ProgressTracker.Step INITIALISING = new ProgressTracker.Step("Performing initial steps.");
     private final ProgressTracker.Step BUILDING = new ProgressTracker.Step("Performing initial steps.");
@@ -48,8 +52,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         this.etfSponsor = etfSponsor;
         this.participantAccount = participantAccount;
     }**/
-    public ValidateAndNotifySponsorFlow(Basket basket, Party participantAccount) {
-        this.basket = basket;
+    public ValidateAndNotifySponsorFlow(UniqueIdentifier linearId, Party participantAccount) {
+        this.linearId = linearId;
         this.participantAccount = participantAccount;
     }
 
@@ -65,9 +69,12 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         final TransactionBuilder txBuilder = new TransactionBuilder();
         txBuilder.setNotary(notary);
 
+        final StateAndRef<Basket> obligationToTransfer = getBasketsByLinearId(linearId);
+        final Basket basket = obligationToTransfer.getState().getData();
+
         // We create the transaction components.
         //Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
-        Basket newBasket = new Basket(getOurIdentity(), this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
+        Basket newBasket = new Basket(getOurIdentity(), this.participantAccount, basket.getProducts(), basket.getReqProduct(), basket.getLinearId());
         StateAndContract outputContractAndState = new StateAndContract(newBasket, ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
         //List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
         List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), participantAccount.getOwningKey());
