@@ -36,6 +36,22 @@ public class Basket implements LinearState {
         this.linearId = new UniqueIdentifier();
     }
 
+    public Basket(AbstractParty issuer, AbstractParty owner, List<Product> products) {
+        this.issuer = issuer;
+        this.owner = owner;
+        this.products = products;
+        this.reqProduct = null;
+        this.linearId = new UniqueIdentifier();
+    }
+
+    public Basket(AbstractParty issuer, AbstractParty owner, List<Product> products, UniqueIdentifier linearId) {
+        this.issuer = issuer;
+        this.owner = owner;
+        this.products = products;
+        this.reqProduct = null;
+        this.linearId = linearId;
+    }
+
     @NotNull
     @Override
     public UniqueIdentifier getLinearId() {
