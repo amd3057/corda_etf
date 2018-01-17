@@ -60,9 +60,9 @@ public class IssueOrder {
     @GET
     @Path("products")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Product> products(@QueryParam(value = "type") String type) {
+    public List<Product> products() {
 
-        return rpcOps.vaultQuery(Product.class).getStates().stream().filter((p) -> p.getState().getData().getProductType().equals(ProductType.valueOf(type))).map((p) -> p.getState().getData()).collect(Collectors.toList());
+        return rpcOps.vaultQuery(Product.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList());
     }
 
     @GET
