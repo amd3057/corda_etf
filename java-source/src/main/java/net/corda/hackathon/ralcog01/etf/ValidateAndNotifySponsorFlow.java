@@ -66,7 +66,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         txBuilder.setNotary(notary);
 
         // We create the transaction components.
-        Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
+        //Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
+        Basket newBasket = new Basket(getOurIdentity(), this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
         StateAndContract outputContractAndState = new StateAndContract(newBasket, ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
         //List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
         List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), participantAccount.getOwningKey());
