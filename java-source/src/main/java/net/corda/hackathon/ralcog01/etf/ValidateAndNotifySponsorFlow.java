@@ -21,10 +21,25 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
     private final Party etfSponsor;
     private final Party participantAccount;
 
-    /**
-     * The progress tracker provides checkpoints indicating the progress of the flow to observers.
-     */
-    private final ProgressTracker progressTracker = new ProgressTracker();
+    private final ProgressTracker.Step INITIALISING = new ProgressTracker.Step("Performing initial steps.");
+    private final ProgressTracker.Step BUILDING = new ProgressTracker.Step("Performing initial steps.");
+    private final ProgressTracker.Step SIGNING = new ProgressTracker.Step("Signing transaction.");
+    private final ProgressTracker.Step COLLECTING = new ProgressTracker.Step("Collecting counterparty signature.") {
+        @Override
+        public ProgressTracker childProgressTracker() {
+            return CollectSignaturesFlow.Companion.tracker();
+        }
+    };
+    private final ProgressTracker.Step FINALISING = new ProgressTracker.Step("Finalising transaction.") {
+        @Override
+        public ProgressTracker childProgressTracker() {
+            return FinalityFlow.Companion.tracker();
+        }
+    };
+
+    private final ProgressTracker progressTracker = new ProgressTracker(
+            INITIALISING, BUILDING, SIGNING, COLLECTING, FINALISING
+    );
 
     public ValidateAndNotifySponsorFlow(Basket basket, Party etfCustodian, Party etfSponsor, Party participantAccount) {
         this.basket = basket;
@@ -35,8 +50,12 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
     @Override
     public SignedTransaction call() throws FlowException {
+        // Step 1. Initialisation.
+        progressTracker.setCurrentStep(INITIALISING);
         // We retrieve the notary identity from the network map.
         final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
+        // Step 3. Sign the transaction.
+        progressTracker.setCurrentStep(SIGNING);
         // We create a transaction builder.
         final TransactionBuilder txBuilder = new TransactionBuilder();
         txBuilder.setNotary(notary);
@@ -53,6 +72,7 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
 // Verifying the transaction.
         txBuilder.verify(getServiceHub());
+        progressTracker.setCurrentStep(COLLECTING);
 
 // Signing the transaction.
         final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
@@ -63,7 +83,7 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 // Obtaining the counterparty's signature.
         SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
                 signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
-
+        progressTracker.setCurrentStep(FINALISING);
 // Finalising the transaction.
         subFlow(new FinalityFlow(fullySignedTx));
 
