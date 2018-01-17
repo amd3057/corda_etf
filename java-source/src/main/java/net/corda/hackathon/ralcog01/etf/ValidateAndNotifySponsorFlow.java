@@ -17,8 +17,8 @@ import java.util.List;
 public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
     private final Basket basket;
-    private final Party etfCustodian;
-    private final Party etfSponsor;
+    //private final Party etfCustodian;
+    //private final Party etfSponsor;
     private final Party participantAccount;
 
     private final ProgressTracker.Step INITIALISING = new ProgressTracker.Step("Performing initial steps.");
@@ -41,10 +41,15 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
             INITIALISING, BUILDING, SIGNING, COLLECTING, FINALISING
     );
 
+    /**
     public ValidateAndNotifySponsorFlow(Basket basket, Party etfCustodian, Party etfSponsor, Party participantAccount) {
         this.basket = basket;
         this.etfCustodian = etfCustodian;
         this.etfSponsor = etfSponsor;
+        this.participantAccount = participantAccount;
+    }**/
+    public ValidateAndNotifySponsorFlow(Basket basket, Party participantAccount) {
+        this.basket = basket;
         this.participantAccount = participantAccount;
     }
 
@@ -63,7 +68,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         // We create the transaction components.
         Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
         StateAndContract outputContractAndState = new StateAndContract(newBasket, ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
-        List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
+        //List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
+        List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), participantAccount.getOwningKey());
         Command cmd = new Command<>(new ValidateAndNotifySponsorContract.Create(), requiredSigners);
 
 
@@ -78,7 +84,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
 // Creating a session with the other party.
-        FlowSession otherpartySession = initiateFlow(etfCustodian);
+        //FlowSession otherpartySession = initiateFlow(etfCustodian);
+        FlowSession otherpartySession = initiateFlow(participantAccount);
 
 // Obtaining the counterparty's signature.
         SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
