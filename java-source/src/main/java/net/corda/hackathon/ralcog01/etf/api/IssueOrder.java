@@ -84,35 +84,62 @@ public class IssueOrder {
 
         try{
 
-        List<Product> products = new ArrayList<>();
+            List<Product> products = new ArrayList<>();
 
             products.add(ProductBuilder.setAndGetProductStaticData("AAPL",175.00,100,myIdentity));
             products.add(ProductBuilder.setAndGetProductStaticData("MSFT",475.00,100,myIdentity));
             products.add(ProductBuilder.setAndGetProductStaticData("AMZN",189.00,100,myIdentity));
             products.add(ProductBuilder.setAndGetProductStaticData("FB",115.00,100,myIdentity));
             products.add(ProductBuilder.setAndGetProductStaticData("BRK.B",96.00,100,myIdentity));
-        if(products.size()==0)
-        {
-            final String msg = String.format("Product Size is sent %s from valut \n%s",
-                    "", products);
-            return Response.status(CREATED).entity(msg).build();
-        }
+            if(products.size()==0)
+            {
+                final String msg = String.format("Product Size is sent %s from valut \n%s",
+                        "", products);
+                return Response.status(CREATED).entity(msg).build();
+            }
 
 //        List<Product> products = productsStream.filter((p) -> basketproducts.contains((p.getState().getData().getTicker()))).map((p) -> p.getState().getData())
 //                .collect(Collectors.toList());
 
 
-        // 1. Get party objects for the counterparty.
-        final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyB", false);
-        if (lenderIdentities.size() != 1) {
-            final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
-            throw new IllegalStateException(errMsg);
-        }
-        final Party lenderIdentity = lenderIdentities.iterator().next();
+            // 1. Get party objects for the counterparty.
+            final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyB", false);
+            if (lenderIdentities.size() != 1) {
+                final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
+                throw new IllegalStateException(errMsg);
+            }
+            final Party lenderIdentity = lenderIdentities.iterator().next();
 
-        Product reqEtf = createETF(ticker, Integer.parseInt(requestedQty), products, myIdentity);
-        Basket basket = new Basket(myIdentity, lenderIdentity, products, reqEtf);
-          final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
+            Product reqEtf = createETF(ticker, Integer.parseInt(requestedQty), products, myIdentity);
+            Basket basket = new Basket(myIdentity, lenderIdentity, products, reqEtf);
+            final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
+            flowHandle.getReturnValue().get();
+
+            return Response.status(CREATED).entity("Success").build();
+        } catch (Exception ex) {
+            StringWriter errors = new StringWriter();
+            ex.printStackTrace(new PrintWriter(errors));
+            return Response.status(BAD_REQUEST).entity(errors.toString()).build();
+        }
+
+    }
+
+    @GET
+    @Path("confirm")
+    public Response createOrder(
+            @QueryParam(value = "linerId") String id) {
+        try{
+
+            final UniqueIdentifier linearId = UniqueIdentifier.Companion.fromString(id);
+            // 1. Get party objects for the counterparty.
+            final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyC", false);
+            if (lenderIdentities.size() != 1) {
+                final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
+                throw new IllegalStateException(errMsg);
+            }
+            final Party lenderIdentity = lenderIdentities.iterator().next();
+
+            final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(ValidateAndNotifySponsorFlow.class, linearId, lenderIdentity);
             flowHandle.getReturnValue().get();
 
             return Response.status(CREATED).entity("Success").build();

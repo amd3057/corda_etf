@@ -47,15 +47,12 @@ abstract class OrderBaseFlow extends FlowLogic<SignedTransaction> {
     }
 
     StateAndRef<Basket> getBasketsByLinearId(UniqueIdentifier linearId) throws FlowException {
-        QueryCriteria queryCriteria = new QueryCriteria.LinearStateQueryCriteria(
-                null,
-                ImmutableList.of(linearId),
-                Vault.StateStatus.UNCONSUMED,
-                null);
+        QueryCriteria queryCriteria = new QueryCriteria.LinearStateQueryCriteria(null,
+                ImmutableList.of(linearId.getId()));
 
         List<StateAndRef<Basket>> baskets = getServiceHub().getVaultService().queryBy(Basket.class, queryCriteria).getStates();
         if (baskets.size() != 1) {
-            throw new FlowException(String.format("Obligation with id %s not found.", linearId));
+            throw new FlowException(String.format("Basket with id %s not found.", linearId));
         }
         return baskets.get(0);
     }

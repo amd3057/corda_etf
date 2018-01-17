@@ -38,7 +38,7 @@ public class ValidateAndNotifySponsorContract implements Contract {
             check.using("The lender and the borrower cannot be the same entity.", issuer != owner);
             // Constraints on the signers.
             final List<PublicKey> signers = command.getSigners();
-            check.using("There must be three signers.", signers.size()==3);
+//            check.using("There must be three signers.", signers.size()==3);
 //            check.using("The issuer and owner must be signers.", signers.containsAll(
 //                    ImmutableList.of(owner.getOwningKey(), issuer.getOwningKey())));
 

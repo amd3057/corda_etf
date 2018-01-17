@@ -1,5 +1,6 @@
 package net.corda.hackathon.ralcog01.etf;
 
+import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndContract;
@@ -17,6 +18,7 @@ import java.security.PublicKey;
 import java.util.List;
 
 @InitiatingFlow
+@StartableByRPC
 public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
 
     //private final Basket basket;
@@ -56,9 +58,9 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         this.linearId = linearId;
         this.participantAccount = participantAccount;
     }
-
+    @Suspendable
     @Override
-    public SignedTransaction call() throws FlowException {
+      public SignedTransaction call() throws FlowException {
         // Step 1. Initialisation.
         progressTracker.setCurrentStep(INITIALISING);
         // We retrieve the notary identity from the network map.
@@ -75,7 +77,8 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         // We create the transaction components.
         //Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
         Basket newBasket = new Basket(getOurIdentity(), this.participantAccount, basket.getProducts(), basket.getReqProduct(), basket.getLinearId());
-        StateAndContract outputContractAndState = new StateAndContract(newBasket, ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
+        StateAndContract outputContractAndState = new StateAndContract(basket.getReqProduct().withNewOwner(participantAccount).getOwnableState(), ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
+
         //List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
         List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), participantAccount.getOwningKey());
         Command cmd = new Command<>(new ValidateAndNotifySponsorContract.Create(), requiredSigners);
