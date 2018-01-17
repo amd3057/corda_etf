@@ -65,6 +65,15 @@ public class IssueOrder {
         return rpcOps.vaultQuery(Product.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList());
     }
 
+    @GET
+    @Path("baskets")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> baskets() {
+
+        return rpcOps.vaultQuery(Basket.class).getStates().stream().map((p) -> p.getState().getData().getLinearId().toString()).collect(Collectors.toList());
+    }
+
+
 
     @GET
     @Path("etfs")
@@ -138,7 +147,8 @@ public class IssueOrder {
             Basket basket = new Basket(myIdentity, lenderIdentity, products, reqEtf);
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
             flowHandle.getReturnValue().get();
-            final String msg = String.format("ETF Delivered to Participant Account and updated to ledger.\n");
+
+            final String msg = String.format("Basket Delivered to ETF Custodian and updated to ledger.\n");
             return Response.status(CREATED).entity(msg).build();
         } catch (Exception ex) {
             StringWriter errors = new StringWriter();
@@ -165,7 +175,7 @@ public class IssueOrder {
 
             final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(ValidateAndNotifySponsorFlow.class, linearId, lenderIdentity);
             flowHandle.getReturnValue().get();
-            final String msg = String.format("Basket Delivered to ETF Custodian and updated to ledger.\n");
+            final String msg = String.format("ETF Delivered to Participant Account and updated to ledger.\n");
             return Response.status(CREATED).entity(msg).build();
 
         } catch (Exception ex) {
