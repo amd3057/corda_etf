@@ -3,6 +3,8 @@ package net.corda.hackathon.ralcog01.etf;
 import co.paralleluniverse.fibers.Suspendable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import net.corda.core.contracts.Command;
+import net.corda.core.contracts.StateAndContract;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.flows.*;
 import net.corda.core.identity.CordaX500Name;
@@ -11,12 +13,14 @@ import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
 import net.corda.hackathon.ralcog01.etf.OrderBaseFlow.SignTxFlowNoChecking;
+import org.apache.logging.slf4j.Log4jLogger;
 
 import java.security.PublicKey;
 import java.time.Duration;
 import java.util.List;
 
 public class IssueOrderFlow {
+
     @InitiatingFlow
     @StartableByRPC
     public static class Initiator extends OrderBaseFlow {
@@ -60,40 +64,41 @@ public class IssueOrderFlow {
         public SignedTransaction call() throws FlowException {
             // Step 1. Initialisation.
             progressTracker.setCurrentStep(INITIALISING);
-            final Basket basket = enrichBasket(this.basket, this.requester);
-            final PublicKey ourSigningKey = basket.getOwner().getOwningKey();
-
-            // Step 2. Building.
-            progressTracker.setCurrentStep(BUILDING);
-            final List<PublicKey> requiredSigners = basket.getParticipantKeys();
-
-            final TransactionBuilder utx = new TransactionBuilder(getFirstNotary())
-                    .addOutputState(basket, IssueOrderContract.ISSUE_ORDER_CONTRACT_ID)
-                    .addCommand(new IssueOrderContract.Commands.Issue(), requiredSigners)
-                    .setTimeWindow(getServiceHub().getClock().instant(), Duration.ofSeconds(30));
+            // We retrieve the notary identity from the network map.
+            final Party notary = getServiceHub().getNetworkMapCache().getNotaryIdentities().get(0);
 
             // Step 3. Sign the transaction.
             progressTracker.setCurrentStep(SIGNING);
-            final SignedTransaction ptx = getServiceHub().signInitialTransaction(utx, ourSigningKey);
+            // We create a transaction builder and add the components.
 
-            // Step 4. Get the counter-party signature.
+            StateAndContract outputContractAndState = new StateAndContract(basket, IssueOrderContract.ISSUE_ORDER_CONTRACT_ID);
+            List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), requester.getOwningKey());
+            Command cmd = new Command<>(new IssueOrderContract.Commands.Issue(), requiredSigners);
+            final TransactionBuilder txBuilder = new TransactionBuilder();
+            txBuilder.setNotary(notary);
+            //We add the items to the builder.
+            txBuilder.withItems(outputContractAndState, cmd);
+
+            // Verifying the transaction.
+            txBuilder.verify(getServiceHub());
             progressTracker.setCurrentStep(COLLECTING);
-            final FlowSession requesterFlow = initiateFlow(requester);
-            final SignedTransaction stx = subFlow(new CollectSignaturesFlow(
-                    ptx,
-                    ImmutableSet.of(requesterFlow),
-                    ImmutableList.of(ourSigningKey),
-                    COLLECTING.childProgressTracker())
-            );
+            // Signing the transaction.
+            // Signing the transaction.
+            final SignedTransaction signedTx = getServiceHub().signInitialTransaction(txBuilder);
 
-            // Step 5. Finalise the transaction.
+        // Creating a session with the other party.
+            FlowSession otherpartySession = initiateFlow(requester);
+
+        // Obtaining the counterparty's signature.
+            SignedTransaction fullySignedTx = subFlow(new CollectSignaturesFlow(
+                    signedTx, ImmutableList.of(otherpartySession), CollectSignaturesFlow.tracker()));
+        // Step 5. Finalise the transaction.
             progressTracker.setCurrentStep(FINALISING);
-            //return subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
-            subFlow(new FinalityFlow(stx, FINALISING.childProgressTracker()));
-
-            Party apAgent = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("AA", "New York", "US"));
-            return subFlow(new DeliverBasketFlow(basket, apAgent));
-
+            // Finalising the transaction.
+            // Finalising the transaction.
+            subFlow(new FinalityFlow(fullySignedTx));
+            //progressTracker.setCurrentStep();
+         return null;
         }
 
         @Suspendable
@@ -120,20 +125,20 @@ public class IssueOrderFlow {
             return new Basket(basket.getIssuer(), basket.getOwner(), basket.getProducts(), basket.getReqProduct(), new UniqueIdentifier());
         }
     }
-
-    @InitiatedBy(IssueOrderFlow.Initiator.class)
-    public static class Responder extends FlowLogic<SignedTransaction> {
-        private final FlowSession otherFlow;
-
-        public Responder(FlowSession otherFlow) {
-            this.otherFlow = otherFlow;
-        }
-
-        @Suspendable
-        @Override
-        public SignedTransaction call() throws FlowException {
-            final SignedTransaction stx = subFlow(new SignTxFlowNoChecking(otherFlow, SignTransactionFlow.Companion.tracker()));
-            return waitForLedgerCommit(stx.getId());
-        }
-    }
+//
+//    @InitiatedBy(IssueOrderFlow.Initiator.class)
+//    public static class Responder extends FlowLogic<SignedTransaction> {
+//        private final FlowSession otherFlow;
+//
+//        public Responder(FlowSession otherFlow) {
+//            this.otherFlow = otherFlow;
+//        }
+//
+//        @Suspendable
+//        @Override
+//        public SignedTransaction call() throws FlowException {
+//            final SignedTransaction stx = subFlow(new SignTxFlowNoChecking(otherFlow, SignTransactionFlow.Companion.tracker()));
+//            return waitForLedgerCommit(stx.getId());
+//        }
+//    }
 }

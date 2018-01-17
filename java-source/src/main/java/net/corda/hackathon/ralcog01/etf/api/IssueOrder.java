@@ -2,13 +2,19 @@ package net.corda.hackathon.ralcog01.etf.api;
 
 
 import com.google.common.collect.ImmutableMap;
+import javafx.beans.property.ListProperty;
 import net.corda.core.contracts.Amount;
+import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.identity.AbstractParty;
 import net.corda.core.identity.Party;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.messaging.FlowHandle;
+import net.corda.core.node.services.Vault;
+import net.corda.core.node.services.vault.Builder;
+import net.corda.core.node.services.vault.CriteriaExpression;
+import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
 
 import net.corda.hackathon.ralcog01.etf.*;
@@ -19,6 +25,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,36 +77,49 @@ public class IssueOrder {
     @GET
     @Path("create")
     public Response createOrder(
-            @QueryParam(value = "tickers") List<String> basketproducts,
             @QueryParam(value = "ticker") String ticker,
             @QueryParam(value = "quantity") String requestedQty) {
 
 
-        //Prepare basket
 
-        Stream<StateAndRef<Product>> productsStream = rpcOps.vaultQuery(Product.class).getStates().stream();
-        List<Product> products = productsStream.filter((p) -> basketproducts.contains((p.getState().getData().getTicker()))).map((p) -> p.getState().getData())
-                .collect(Collectors.toList());
+        try{
+
+        List<Product> products = new ArrayList<>();
+
+            products.add(ProductBuilder.setAndGetProductStaticData("AAPL",175.00,100,myIdentity));
+            products.add(ProductBuilder.setAndGetProductStaticData("MSFT",475.00,100,myIdentity));
+            products.add(ProductBuilder.setAndGetProductStaticData("AMZN",189.00,100,myIdentity));
+            products.add(ProductBuilder.setAndGetProductStaticData("FB",115.00,100,myIdentity));
+            products.add(ProductBuilder.setAndGetProductStaticData("BRK.B",96.00,100,myIdentity));
+        if(products.size()==0)
+        {
+            final String msg = String.format("Product Size is sent %s from valut \n%s",
+                    "", products);
+            return Response.status(CREATED).entity(msg).build();
+        }
+
+//        List<Product> products = productsStream.filter((p) -> basketproducts.contains((p.getState().getData().getTicker()))).map((p) -> p.getState().getData())
+//                .collect(Collectors.toList());
+
 
         // 1. Get party objects for the counterparty.
-        final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
+        final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyB", false);
         if (lenderIdentities.size() != 1) {
             final String errMsg = String.format("Found %d identities for the lender.", lenderIdentities.size());
             throw new IllegalStateException(errMsg);
         }
         final Party lenderIdentity = lenderIdentities.iterator().next();
 
-        Product etf = createETF(ticker, Integer.parseInt(requestedQty), products, myIdentity);
-        Basket basket = new Basket(myIdentity, lenderIdentity, products, etf);
-        try {
-            final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
+        Product reqEtf = createETF(ticker, Integer.parseInt(requestedQty), products, myIdentity);
+        Basket basket = new Basket(myIdentity, lenderIdentity, products, reqEtf);
+          final FlowHandle<SignedTransaction> flowHandle = rpcOps.startFlowDynamic(IssueOrderFlow.Initiator.class, basket, lenderIdentity);
+            flowHandle.getReturnValue().get();
 
-            final SignedTransaction result = flowHandle.getReturnValue().get();
-            final String msg = String.format("Transaction id %s committed to ledger.\n%s",
-                    result.getId(), result.getTx().getOutputStates().get(0));
-            return Response.status(CREATED).entity(msg).build();
-        } catch (Exception e) {
-            return Response.status(BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(CREATED).entity("Success").build();
+        } catch (Exception ex) {
+            StringWriter errors = new StringWriter();
+            ex.printStackTrace(new PrintWriter(errors));
+            return Response.status(BAD_REQUEST).entity(errors.toString()).build();
         }
 
     }

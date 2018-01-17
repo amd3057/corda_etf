@@ -44,7 +44,7 @@ public class DeliverBasketFlow extends OrderBaseFlow {
         final TransactionBuilder txBuilder = new TransactionBuilder();
         txBuilder.setNotary(notary);
 
-        Party etfCustodian = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("EC", "New York", "US"));
+        Party etfCustodian = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyC", "New York", "US"));
 
         // We create the transaction components.
         Basket newBasket = new Basket(this.apAgent, etfCustodian, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
@@ -73,7 +73,7 @@ public class DeliverBasketFlow extends OrderBaseFlow {
         subFlow(new FinalityFlow(fullySignedTx));
 
 // Call the validation and notify sponsor flow
-        Party etfSponsor = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("ES", "New York", "US"));
+        Party etfSponsor = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PartyB", "New York", "US"));
         Party participatingAccount = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PA", "New York", "US"));
         subFlow(new ValidateAndNotifySponsorFlow(newBasket, etfCustodian, etfSponsor, participatingAccount));
 

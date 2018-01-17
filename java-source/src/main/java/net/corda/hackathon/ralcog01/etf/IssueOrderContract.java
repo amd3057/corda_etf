@@ -53,8 +53,8 @@ public class IssueOrderContract implements Contract {
             Basket basket = (Basket) tx.getOutputStates().get(0);
             req.using("A newly issued basket must have a positive number of products.", basket.getProducts().size() > 0);
             req.using("The issuer and owner cannot be the same identity.", !basket.getIssuer().equals(basket.getOwner()));
-            req.using("Both lender and borrower together only may sign issue order transaction.",
-                    signers.equals(keysFromParticipants(basket)));
+//            req.using("Both lender and borrower together only may sign issue order transaction.",
+//                    signers.equals(keysFromParticipants(basket)));
             return null;
         });
     }

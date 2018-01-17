@@ -11,7 +11,7 @@ public enum ProductBuilder {
 
     instance;
 
-    static Product setAndGetProductStaticData(final String ticker, final double price, final Integer quantity, AbstractParty owner) {
+    public static Product setAndGetProductStaticData(final String ticker, final double price, final Integer quantity, AbstractParty owner) {
          if ("AAPL".equals(ticker)) {
              return new Product("AAPL","AAPL123", "Equity", "STOCK",
                       "Apple", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
