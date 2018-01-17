@@ -78,7 +78,7 @@ public class IssueOrder {
     @GET
     @Path("etfs")
     @Produces(MediaType.APPLICATION_JSON)
-    public Product etfs() {
+    public List<Product>  etfs() {
 
         //return rpcOps.vaultQuery(Product.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList());
         List<Product> underlying = new ArrayList<>();
@@ -102,9 +102,12 @@ public class IssueOrder {
         }
         final Party lenderIdentity = lenderIdentities.iterator().next();
 
-        return new Product("SNY5", "SNY5Sd", "Equity", "ETF",
+        Product product = new Product("SNY5", "SNY5Sd", "Equity", "ETF",
                 "SNP5", "Information Technology", "NYSE", ProductState.ACTIVE.name(),
                 10.00, 10.00, lists, lenderIdentity, "SNY5.X", 10.00, 50000);
+        List<Product> products = new ArrayList<>();
+        products.add(product);
+       return  products;
     }
 
     @GET
