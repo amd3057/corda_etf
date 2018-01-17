@@ -46,6 +46,8 @@ public class Product implements OwnableState {
         return new CommandAndState(new ProductContract.Create(), this);
     }
 
+    
+
     @NotNull
     @Override
     public List<AbstractParty> getParticipants() {
