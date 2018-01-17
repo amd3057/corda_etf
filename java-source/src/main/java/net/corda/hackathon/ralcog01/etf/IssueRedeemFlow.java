@@ -20,7 +20,8 @@ public class IssueRedeemFlow {
     @StartableByRPC
     public static class Initiator extends OrderBaseFlow {
         private final Product product;
-        private final Party ap;
+        //private final Party ap;
+        private final Party pa;
         //private final Boolean anonymous;
 
         private final ProgressTracker.Step INITIALISING = new ProgressTracker.Step("Performing initial steps.");
@@ -43,9 +44,16 @@ public class IssueRedeemFlow {
                 INITIALISING, BUILDING, SIGNING, COLLECTING, FINALISING
         );
 
+        /**
         public Initiator(Product product, Party ap) {
             this.product = product;
             this.ap = ap;
+            //this.anonymous = anonymous;
+        }
+         **/
+        public Initiator(Product product, Party pa) {
+            this.product = product;
+            this.pa = pa;
             //this.anonymous = anonymous;
         }
 
@@ -64,8 +72,8 @@ public class IssueRedeemFlow {
 
             // Step 2. Building.
             progressTracker.setCurrentStep(BUILDING);
-            Party pa = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PA", "New York", "US"));
-            final List<PublicKey> requiredSigners = ImmutableList.of(ap.getOwningKey(), pa.getOwningKey());
+            //Party pa = getServiceHub().getNetworkMapCache().getPeerByLegalName(new CordaX500Name("PA", "New York", "US"));
+            final List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), pa.getOwningKey());
 
             final TransactionBuilder utx = new TransactionBuilder(getFirstNotary())
                     .addOutputState(product, NullReedemContract.REDEEM_CONTRACT_ID)
@@ -78,7 +86,8 @@ public class IssueRedeemFlow {
 
             // Step 4. Get the counter-party signature.
             progressTracker.setCurrentStep(COLLECTING);
-            final FlowSession requesterFlow = initiateFlow(ap);
+            //final FlowSession requesterFlow = initiateFlow(ap);
+            final FlowSession requesterFlow = initiateFlow(pa);
             final SignedTransaction stx = subFlow(new CollectSignaturesFlow(
                     ptx,
                     ImmutableSet.of(requesterFlow),
