@@ -77,7 +77,10 @@ public class ValidateAndNotifySponsorFlow extends OrderBaseFlow {
         // We create the transaction components.
         //Basket newBasket = new Basket(this.etfCustodian, this.participantAccount, this.basket.getProducts(), this.basket.getReqProduct(), this.basket.getLinearId());
         Basket newBasket = new Basket(getOurIdentity(), this.participantAccount, basket.getProducts(), basket.getReqProduct(), basket.getLinearId());
-        StateAndContract outputContractAndState = new StateAndContract(basket.getReqProduct().withNewOwner(participantAccount).getOwnableState(), ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
+
+        Product product = new Product(basket.getReqProduct(),participantAccount);
+        StateAndContract outputContractAndState = new StateAndContract(product, ValidateAndNotifySponsorContract.VALIDATE_AND_NOTIFY_BASKET_CONTRACT_ID);
+
 
         //List<PublicKey> requiredSigners = ImmutableList.of(etfCustodian.getOwningKey(), etfSponsor.getOwningKey(), participantAccount.getOwningKey());
         List<PublicKey> requiredSigners = ImmutableList.of(getOurIdentity().getOwningKey(), participantAccount.getOwningKey());
