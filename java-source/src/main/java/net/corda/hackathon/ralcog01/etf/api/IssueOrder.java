@@ -76,8 +76,8 @@ public class IssueOrder {
         //Prepare basket
 
         Stream<StateAndRef<Product>> productsStream = rpcOps.vaultQuery(Product.class).getStates().stream();
-        Set<Product> products = productsStream.filter((p) -> basketproducts.contains((p.getState().getData().getTicker()))).map((p) -> p.getState().getData())
-                .collect(Collectors.toSet());
+        List<Product> products = productsStream.filter((p) -> basketproducts.contains((p.getState().getData().getTicker()))).map((p) -> p.getState().getData())
+                .collect(Collectors.toList());
 
         // 1. Get party objects for the counterparty.
         final Set<Party> lenderIdentities = rpcOps.partiesFromName("PartyA", false);
@@ -102,7 +102,7 @@ public class IssueOrder {
 
     }
 
-    private Product createETF(final String ticker, final Integer quantity, Set<Product> underlying, AbstractParty owner) {
+    private Product createETF(final String ticker, final Integer quantity, List<Product> underlying, AbstractParty owner) {
 
         List<ProductQty> lists = new ArrayList<>();
         for (Product p : underlying) {
