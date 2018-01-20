@@ -74,6 +74,15 @@ public class IssueOrder {
     }
 
 
+    @GET
+    @Path("basketsOnledger")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Basket> basketsOnLedger() {
+
+        return rpcOps.vaultQuery(Basket.class).getStates().stream().map((p) -> p.getState().getData()).collect(Collectors.toList());
+    }
+
+
 
     @GET
     @Path("etfs")
